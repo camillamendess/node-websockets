@@ -5,6 +5,7 @@ import http from "http";
 
 // Importa a classe Server do módulo socket.io, que permite a comunicação em tempo real baseada em WebSockets.
 import { Server } from "socket.io";
+import "./dbConnect.js";
 
 const app = express();
 const porta = process.env.port || 3000;
