@@ -2,17 +2,23 @@ import {
   atualizaDocumento,
   encontrarDocumento,
   obterDocumentos,
+  adicionarDocumento,
 } from "./documentosDb.js";
 import io from "./server.js";
 
-// Define um manipulador de eventos para a conexão de novos clientes.
+// manipulador de eventos para a conexão de novos clientes.
 io.on("connection", (socket) => {
-  // Quando um cliente se conecta, exibe uma mensagem no console com o ID do socket.
-  console.log("Um cliente se conectou! ID:", socket.id);
-
   socket.on("obter_documentos", async (devolverDocs) => {
     const documentos = await obterDocumentos();
     devolverDocs(documentos);
+  });
+
+  socket.on("adicionar_documento", async (nomeDoDocumento) => {
+    const resultado = await adicionarDocumento(nomeDoDocumento);
+
+    if (resultado.acknowledged) {
+      io.emit("adicionar_documento_interface", nomeDoDocumento);
+    }
   });
 
   socket.on("selecionar_documento", async (nomeDoDocumento, devolverTexto) => {
