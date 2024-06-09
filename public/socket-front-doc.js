@@ -15,7 +15,6 @@ function emitirTextoEditor(dados) {
   socket.emit("texto_editor", dados);
 }
 
-
 // Define um manipulador de eventos para o evento 'texto_editor_clientes' recebido do servidor.
 socket.on("texto_editor_clientes", (texto) => {
   /* Quando o evento 'texto_editor_clientes' é recebido, atualiza o texto do editor chamando a função 'atualizaTextoEditor' com o texto recebido. */
