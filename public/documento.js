@@ -1,12 +1,16 @@
-import { emitirTextoEditor, selecionarDocumento } from "./socket-front-doc.js";
+import {
+  emitirTextoEditor,
+  selecionarDocumento,
+  emitirExcluirDocumento,
+} from "./socket-front-doc.js";
 
 const parametros = new URLSearchParams(window.location.search);
 const nomeDocumento = parametros.get("nome");
 
-// Obtém uma referência ao elemento de texto do editor usando o seu ID 'editor-texto'.
 const textoEditor = document.getElementById("editor-texto");
-
 const tituloDocumento = document.getElementById("titulo-documento");
+const botaoExcluirDocumento = document.getElementById("excluir-documento");
+
 tituloDocumento.textContent = nomeDocumento || "Documento sem título";
 
 selecionarDocumento(nomeDocumento);
@@ -25,4 +29,16 @@ function atualizaTextoEditor(texto) {
   // Define o valor do editor de texto com o texto recebido como argumento.
   textoEditor.value = texto;
 }
-export { atualizaTextoEditor };
+
+botaoExcluirDocumento.addEventListener("click", () => {
+  emitirExcluirDocumento(nomeDocumento);
+});
+
+function alertarERedirecionar(nome) {
+  if (nome === nomeDocumento) {
+    alert(`O documento ${nome} foi excluido!`);
+    window.location.href = "/";
+  }
+}
+
+export { atualizaTextoEditor, alertarERedirecionar };
