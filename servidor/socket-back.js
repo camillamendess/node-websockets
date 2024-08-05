@@ -4,8 +4,8 @@ import {
   obterDocumentos,
   adicionarDocumento,
   excluirDocumento,
-} from "./documentosDb.js";
-import io from "./server.js";
+} from "./db/documentosDb.js";
+import io from "./servidor.js";
 
 // manipulador de eventos para a conexão de novos clientes.
 io.on("connection", (socket) => {
