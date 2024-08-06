@@ -1,6 +1,6 @@
-import { emitirCadastrarUsuario } from "./socket-front-cadastro.js";
+import { emitirLoginUsuario } from "./socket-front-login.js";
 
-const form = document.getElementById("form-cadastro");
+const form = document.getElementById("form-login");
 
 form.addEventListener("submit", (evento) => {
   evento.preventDefault(); // Não recarregar a página
@@ -8,5 +8,5 @@ form.addEventListener("submit", (evento) => {
   const nome = form["input-nome"].value; // Pegar valor digitado no form
   const senha = form["input-senha"].value;
 
-  emitirCadastrarUsuario({ nome, senha });
+  emitirLoginUsuario({ nome, senha });
 });

@@ -5,9 +5,9 @@ function encontrarUsuario(nome) {
   return usuariosColecao.findOne({ nome });
 }
 
-function cadastrarUsuario({ usuario, senha }) {
+function cadastrarUsuario({ nome, senha }) {
   const { hashSenha, salSenha } = criaHashESalSenha(senha);
-  return usuariosColecao.insertOne({ usuario, hashSenha, salSenha });
+  return usuariosColecao.insertOne({ nome, hashSenha, salSenha });
 }
 
 export { cadastrarUsuario, encontrarUsuario };
