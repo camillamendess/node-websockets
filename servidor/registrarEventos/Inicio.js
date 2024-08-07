@@ -10,17 +10,17 @@ function registrarEventosInicio(socket, io) {
     devolverDocs(documentos);
   });
 
-  socket.on("adicionar_documento", async (nomeDoDocumento) => {
+  socket.on("adicionar_documento", async (nomeDocumento) => {
     const documentoExiste =
-      (await encontrarDocumento(nomeDoDocumento)) !== null;
+      (await encontrarDocumento(nomeDocumento)) !== null;
 
     if (documentoExiste) {
-      socket.emit("documento_existente", nomeDoDocumento);
+      socket.emit("documento_existente", nomeDocumento);
     } else {
-      const resultado = await adicionarDocumento(nomeDoDocumento);
+      const resultado = await adicionarDocumento(nomeDocumento);
 
       if (resultado.acknowledged) {
-        io.emit("adicionar_documento_interface", nomeDoDocumento);
+        io.emit("adicionar_documento_interface", nomeDocumento);
       }
     }
   });
