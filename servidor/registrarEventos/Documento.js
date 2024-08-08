@@ -1,7 +1,9 @@
 import {
   adicionarConexao,
+  encontrarConexao,
   obterUsuariosDocumento,
-} from "../../public/utils/conexoesDocumentos.js";
+  removerConexao,
+} from "../utils/conexoesDocumentos.js";
 import {
   atualizaDocumento,
   encontrarDocumento,
@@ -16,15 +18,28 @@ function registrarEventosDocumento(socket, io) {
         const documento = await encontrarDocumento(nomeDocumento);
 
         if (documento) {
-          socket.join(nomeDocumento);
+          const conexaoEncontrada = encontrarConexao(
+            nomeDocumento,
+            nomeUsuario
+          );
 
-          adicionarConexao({ nomeDocumento, nomeUsuario });
+          if (!conexaoEncontrada) {
+            socket.join(nomeDocumento);
 
-          const usuariosAtivos = obterUsuariosDocumento(nomeDocumento);
+            adicionarConexao({ nomeDocumento, nomeUsuario, id: socket.id });
 
-          io.to(nomeDocumento).emit("usuarios_ativos", usuariosAtivos);
+            socket.data = {
+              usuarioEntrou: true,
+            };
 
-          devolverTexto(documento.texto);
+            const usuariosAtivos = obterUsuariosDocumento(nomeDocumento);
+
+            io.to(nomeDocumento).emit("usuarios_ativos", usuariosAtivos);
+
+            devolverTexto(documento.texto);
+          } else {
+            socket.emit("usuario_no_documento");
+          }
         } else {
           devolverTexto(null);
         }
@@ -32,27 +47,37 @@ function registrarEventosDocumento(socket, io) {
         console.error(`Erro ao selecionar documento: ${error.message}`);
         devolverTexto(null);
       }
+
+      socket.on("texto_editor", async ({ texto, nomeDocumento }) => {
+        try {
+          const atualizacao = await atualizaDocumento(nomeDocumento, texto);
+
+          if (atualizacao.modifiedCount) {
+            socket.to(nomeDocumento).emit("texto_editor_clientes", texto);
+          }
+        } catch (error) {
+          console.error(`Erro ao atualizar documento: ${error.message}`);
+        }
+      });
+
+      socket.on("excluir_documento", async (nome) => {
+        const exclusao = await excluirDocumento(nome);
+        if (exclusao.deletedCount) {
+          io.emit("excluir_documento_interface", nome);
+        }
+      });
+
+      socket.on("disconnect", () => {
+        if (socket.data.usuarioEntrou) {
+          removerConexao(socket.id);
+
+          const usuariosAtivos = obterUsuariosDocumento(nomeDocumento);
+
+          io.to(nomeDocumento).emit("usuarios_ativos", usuariosAtivos);
+        }
+      });
     }
   );
-
-  socket.on("texto_editor", async ({ texto, nomeDocumento }) => {
-    try {
-      const atualizacao = await atualizaDocumento(nomeDocumento, texto);
-
-      if (atualizacao.modifiedCount) {
-        socket.to(nomeDocumento).emit("texto_editor_clientes", texto);
-      }
-    } catch (error) {
-      console.error(`Erro ao atualizar documento: ${error.message}`);
-    }
-  });
-
-  socket.on("excluir_documento", async (nome) => {
-    const exclusao = await excluirDocumento(nome);
-    if (exclusao.deletedCount) {
-      io.emit("excluir_documento_interface", nome);
-    }
-  });
 }
 
 export default registrarEventosDocumento;

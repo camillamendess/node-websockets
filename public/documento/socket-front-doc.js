@@ -21,13 +21,14 @@ socket.on("connect_error", (erro) => {
 
 function selecionarDocumento(dadosEntrada) {
   socket.emit("selecionar_documento", dadosEntrada, (texto) => {
-    if (texto) {
-      atualizaTextoEditor(texto);
-    } else {
-      alert("Erro ao carregar o documento.");
-    }
+    atualizaTextoEditor(texto);
   });
 }
+
+socket.on("usuario_no_documento", () => {
+  alert("Documento já aberto em outra página");
+  window.location.href = "/";
+});
 
 socket.on("usuarios_ativos", atualizarInterfaceUsuarios);
 
